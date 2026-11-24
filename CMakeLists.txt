@@ -15,6 +15,7 @@ add_executable(HighwayRush
     src/Renderer.cpp
     src/Road.cpp
     src/Player.cpp
+    src/TrafficCar.cpp
 )
 
 target_include_directories(HighwayRush PRIVATE include)

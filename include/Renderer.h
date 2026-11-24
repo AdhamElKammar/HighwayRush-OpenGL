@@ -1,8 +1,11 @@
 #ifndef HIGHWAY_RUSH_RENDERER_H
 #define HIGHWAY_RUSH_RENDERER_H
 
+#include <vector>
+
 class Road;
 class Player;
+struct TrafficCar;
 
 class Renderer {
 public:
@@ -10,7 +13,8 @@ public:
     static constexpr int WORLD_HEIGHT = 720;
 
     void setViewport(int framebufferWidth, int framebufferHeight) const;
-    void drawScene(const Road& road, const Player& player) const;
+    void drawScene(const Road& road, const Player& player,
+                   const std::vector<TrafficCar>& traffic) const;
 
     static void drawRectangle(float left, float bottom, float width,
                               float height, float red, float green, float blue);

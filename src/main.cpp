@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 
@@ -17,10 +18,8 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     }
 }
 
-void processInput(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
+bool isPressed(GLFWwindow* window, int key) {
+    return glfwGetKey(window, key) == GLFW_PRESS;
 }
 } // namespace
 
@@ -63,13 +62,43 @@ int main() {
     glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
     game.resize(framebufferWidth, framebufferHeight);
 
+    double previousTime = glfwGetTime();
     while (glfwWindowShouldClose(window) == GLFW_FALSE) {
-        processInput(window);
+        glfwPollEvents();
+        if (glfwWindowShouldClose(window) == GLFW_TRUE ||
+            isPressed(window, GLFW_KEY_ESCAPE)) {
+            break;
+        }
+
+        const double currentTime = glfwGetTime();
+        // Limit movement in one update after a pause or a slow frame.
+        const float deltaTime = static_cast<float>(
+            std::min(currentTime - previousTime, 0.05));
+        previousTime = currentTime;
+
+        if (game.hasCrashed()) {
+            if (isPressed(window, GLFW_KEY_R)) {
+                game.restart();
+                glfwSetWindowTitle(window, "Highway Rush");
+            }
+        } else {
+            const bool left = isPressed(window, GLFW_KEY_LEFT) ||
+                              isPressed(window, GLFW_KEY_A);
+            const bool right = isPressed(window, GLFW_KEY_RIGHT) ||
+                               isPressed(window, GLFW_KEY_D);
+            const bool accelerate = isPressed(window, GLFW_KEY_UP) ||
+                                    isPressed(window, GLFW_KEY_W);
+            const bool brake = isPressed(window, GLFW_KEY_DOWN) ||
+                               isPressed(window, GLFW_KEY_S);
+            game.update(deltaTime, right - left, accelerate, brake);
+            if (game.hasCrashed()) {
+                glfwSetWindowTitle(window, "Highway Rush | Crashed - press R to restart");
+            }
+        }
         game.render();
 
-        // Show the completed back buffer, then collect window and key events.
+        // Show the completed back buffer.
         glfwSwapBuffers(window);
-        glfwPollEvents();
     }
 
     glfwDestroyWindow(window);

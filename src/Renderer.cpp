@@ -6,6 +6,7 @@
 
 #include "Player.h"
 #include "Road.h"
+#include "TrafficCar.h"
 
 void Renderer::setViewport(int framebufferWidth, int framebufferHeight) const {
     if (framebufferWidth <= 0 || framebufferHeight <= 0) {
@@ -41,7 +42,8 @@ void Renderer::setViewport(int framebufferWidth, int framebufferHeight) const {
     glLoadIdentity();
 }
 
-void Renderer::drawScene(const Road& road, const Player& player) const {
+void Renderer::drawScene(const Road& road, const Player& player,
+                         const std::vector<TrafficCar>& traffic) const {
     glClearColor(0.04f, 0.08f, 0.12f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -49,6 +51,9 @@ void Renderer::drawScene(const Road& road, const Player& player) const {
     glLoadIdentity();
 
     road.draw();
+    for (const TrafficCar& car : traffic) {
+        car.draw();
+    }
     player.draw();
 }
 
